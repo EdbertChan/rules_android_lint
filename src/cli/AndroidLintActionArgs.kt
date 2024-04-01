@@ -99,21 +99,6 @@ internal class AndroidLintActionArgs(
     help = "",
   ).default { emptyList() }
 
-  val compileSdkVersion: String by parser.storing(
-    names = arrayOf("--compile-sdk-version"),
-    help = "",
-  )
-
-  val javaLanguageLevel: String by parser.storing(
-    names = arrayOf("--java-language-level"),
-    help = "",
-  )
-
-  val kotlinLanguageLevel: String by parser.storing(
-    names = arrayOf("--kotlin-language-level"),
-    help = "",
-  )
-
   val enableCheckDependencies: Boolean by parser.flagging(
     names = arrayOf("--enable-check-dependencies"),
     help = "",

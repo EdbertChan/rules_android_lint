@@ -12,6 +12,7 @@ import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import java.io.File
 
 internal class AndroidLintRunner {
 
@@ -58,13 +59,15 @@ internal class AndroidLintRunner {
     )
 
     // Run Android Lint
+    val androidCacheFolder = workingDirectory.resolve("android-cache")
+    Files.createDirectory(androidCacheFolder)
     val invoker = AndroidLintCliInvoker.createUsingJars(jars = arrayOf(args.androidLintCliTool))
     val exitCode = invokeAndroidLintCLI(
       invoker = invoker,
       actionArgs = args,
       projectFilePath = projectFile,
       baselineFilePath = baselineFile,
-      cacheDirectoryPath = workingDirectory.resolve("android-cache"),
+      cacheDirectoryPath = androidCacheFolder,
     )
 
     // Pure hacks to strip the relative paths and exec roots out of the file
@@ -96,20 +99,7 @@ internal class AndroidLintRunner {
       "--xml",
       actionArgs.output.pathString,
       "--exitcode",
-      "--compile-sdk-version",
-      actionArgs.compileSdkVersion,
-      "--java-language-level",
-      actionArgs.javaLanguageLevel,
-      "--kotlin-language-level",
-      actionArgs.kotlinLanguageLevel,
-      "--stacktrace",
-      "--quiet",
-      "--offline",
-      "--baseline",
-      baselineFilePath.pathString,
-      "--update-baseline",
-      "--cache-dir",
-      cacheDirectoryPath.pathString,
+      "--fullpath",
     )
     if (actionArgs.warningsAsErrors) {
       args.add("-Werror")

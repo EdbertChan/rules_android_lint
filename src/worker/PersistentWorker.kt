@@ -87,8 +87,9 @@ internal class PersistentWorker(
   private fun respondToRequest(request: WorkRequest): WorkResponse {
     ByteArrayOutputStream().use { baos ->
       // Create a print stream that the execution can write logs to
-      val printStream = PrintStream(BufferedOutputStream(ByteArrayOutputStream()))
-      var exitCode: Int
+      val localBaos= ByteArrayOutputStream()
+      val printStream = PrintStream(BufferedOutputStream(localBaos))
+      var exitCode: Int = 0
       try {
         // Sanity check the work request arguments
         val arguments =
@@ -108,11 +109,11 @@ internal class PersistentWorker(
         printStream.flush()
       }
 
-      val output = arrayOf(baos.toString())
+      val output = arrayOf(localBaos.toString(), baos.toString())
         .asSequence()
         .map { it.trim() }
         .filter { it.isNotEmpty() }
-        .joinToString("\n")
+        .joinToString("\n") + "\n"
       return WorkResponse(
         exitCode = exitCode,
         output = output,

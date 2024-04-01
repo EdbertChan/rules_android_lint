@@ -72,12 +72,6 @@ def _run_android_lint(
     args.add("--android-lint-cli-tool", android_lint)
     inputs.append(android_lint)
     args.add("--label", "{}".format(module_name))
-    if compile_sdk_version:
-        args.add("--compile-sdk-version", compile_sdk_version)
-    if java_language_level:
-        args.add("--java-language-level", java_language_level)
-    if kotlin_language_level:
-        args.add("--kotlin-language-level", kotlin_language_level)
     for src in _utils.list_or_depset_to_list(srcs):
         args.add("--src", src)
         inputs.append(src)
@@ -107,6 +101,10 @@ def _run_android_lint(
     for check in enable_checks:
         args.add("--enable-check", check)
     for dep in _utils.list_or_depset_to_list(deps):
+        # TODO: Upstream this. There is a bug where Android libraries can be dependencies and therefore their
+        # AndroidManifest.xml can be added
+        if not dep.path.endswith(".aar") and not dep.path.endswith(".jar"):
+            continue
         args.add("--classpath", dep)
         inputs.append(dep)
     if android_lint_enable_check_dependencies:

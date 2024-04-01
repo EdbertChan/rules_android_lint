@@ -18,15 +18,18 @@ object AndroidLintAction {
     override fun processWorkRequest(args: List<String>, printStream: PrintStream): Int {
       val workingDirectory = Files.createTempDirectory("rules")
 
+      val prior_out = System.out
       try {
         val runner = AndroidLintRunner()
         val parsedArgs = AndroidLintActionArgs.parseArgs(args)
-        runner.runAndroidLint(parsedArgs, workingDirectory)
-        return 0
+        System.setOut(printStream)
+        return runner.runAndroidLint(parsedArgs, workingDirectory)
       } catch (exception: Exception) {
         exception.printStackTrace()
+        exception.printStackTrace(printStream)
         return 1
       } finally {
+        System.setOut(prior_out)
         try {
           workingDirectory.toFile().deleteRecursively()
         } catch (e: Exception) {

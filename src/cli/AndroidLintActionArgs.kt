@@ -26,6 +26,11 @@ internal class AndroidLintActionArgs(
     help = "",
   )
 
+  val android_home: String by parser.storing(
+    names = arrayOf("--android_home"),
+    help = "The relative location of Android home",
+  )
+
   val srcs: List<Path> by parser.adding(
     names = arrayOf("--src"),
     help = "",

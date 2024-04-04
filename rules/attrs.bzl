@@ -34,6 +34,10 @@ ATTRS = dict(
         allow_single_file = True,
         doc = "Android manifest to run Android Lint against.",
     ),
+    android_home = attr.label(
+        mandatory = False,
+        doc = "android_home.",
+    ),
     deps = attr.label_list(
         mandatory = False,
         allow_empty = True,

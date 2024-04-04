@@ -93,6 +93,8 @@ internal class AndroidLintRunner {
       projectFilePath.pathString,
       "--xml",
       actionArgs.output.pathString,
+      "--html",
+      actionArgs.htmlOutput.pathString,
       "--exitcode",
       "--fullpath",
     )

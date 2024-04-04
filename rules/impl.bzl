@@ -20,6 +20,7 @@ def _run_android_lint(
         android_lint,
         module_name,
         output,
+        html_output,
         srcs,
         deps,
         resource_files,
@@ -63,7 +64,7 @@ def _run_android_lint(
         android_lint_skip_bytecode_verifier: Disables bytecode verification
     """
     inputs = []
-    outputs = [output]
+    outputs = [output, html_output]
 
     args = ctx.actions.args()
     args.set_param_file_format("multiline")
@@ -203,11 +204,13 @@ def process_android_lint_issues(ctx, regenerate):
         )
 
     output = ctx.actions.declare_file("{}.xml".format(ctx.label.name))
+    html_output = ctx.actions.declare_file("{}.html".format(ctx.label.name))
     _run_android_lint(
         ctx,
         android_lint = _utils.only(_utils.list_or_depset_to_list(_utils.get_android_lint_toolchain(ctx).android_lint.files)),
         module_name = _get_module_name(ctx),
         output = output,
+        html_output = html_output,
         srcs = ctx.files.srcs,
         deps = depset(transitive = deps),
         resource_files = ctx.files.resource_files,
@@ -229,9 +232,11 @@ def process_android_lint_issues(ctx, regenerate):
 
     return struct(
         output = output,
+        html_output = html_output,
         providers = [
             _AndroidLintResultsInfo(
                 output = output,
+                html_output = html_output
             ),
         ],
     )

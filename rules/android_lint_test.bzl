@@ -41,7 +41,7 @@ def _test_impl(ctx):
         DefaultInfo(
             runfiles = ctx.runfiles(files = inputs),
             executable = ctx.outputs.executable,
-            files = depset([ctx.outputs.executable, android_lint_results.output]),
+            files = depset([ctx.outputs.executable, android_lint_results.output, android_lint_results.html_output]),
         ),
     ] + android_lint_results.providers
 

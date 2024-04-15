@@ -141,6 +141,12 @@ def _run_android_lint(
         env = {
             # https://googlesamples.github.io/android-custom-lint-rules/usage/variables.md.html
             "ANDROID_LINT_SKIP_BYTECODE_VERIFIER": ("true" if android_lint_skip_bytecode_verifier else "false"),
+            # https://stackoverflow.com/questions/30511439/java-lang-outofmemoryerror-compressed-class-space
+            # This is for Uber only. Because of the massive size that we run for classes in compilation, we will
+            # breach the limits for compilation space size. We instead decide to use heap space since many of the
+            # classes loaded like with the lint jar are commonly shared between actions.
+            # If you need to debug what is going on, use -Xlog:gc* -Xlog:class+unload=info -Xlog:class+load=info
+            "JVM_FLAGS":"-XX:-UseCompressedClassPointers"
         },
     )
 

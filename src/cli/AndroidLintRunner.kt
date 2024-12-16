@@ -21,13 +21,6 @@ internal class AndroidLintRunner {
     args: AndroidLintActionArgs,
     workingDirectory: Path,
   ): Int {
-    // Create the input baseline file. This is either a copy of the existing baseline
-    // or a new temp one that can be written to
-    val baselineFile = workingDirectory.resolve("${args.label}_lint_baseline")
-    if (!args.regenerateBaselineFile && args.baselineFile != null) {
-      Files.copy(args.baselineFile!!, baselineFile)
-    }
-
     // Split the aars and jars
     val aars = args.classpath.filter { it.extension == "aar" }
     val jars = args.classpath.filter { it.extension == "jar" }
@@ -67,7 +60,6 @@ internal class AndroidLintRunner {
       invoker = invoker,
       actionArgs = args,
       projectFilePath = projectFile,
-      baselineFilePath = baselineFile,
       cacheDirectoryPath = androidCacheFolder,
     )
 
@@ -91,7 +83,6 @@ internal class AndroidLintRunner {
     invoker: AndroidLintCliInvoker,
     actionArgs: AndroidLintActionArgs,
     projectFilePath: Path,
-    baselineFilePath: Path,
     cacheDirectoryPath: Path,
   ): Int {
     val args = mutableListOf(
@@ -104,6 +95,13 @@ internal class AndroidLintRunner {
       "--exitcode",
       "--fullpath",
     )
+    if (actionArgs.baselineFile != null) {
+      args.add("--baseline")
+      args.add((actionArgs.baselineFile as Path).pathString)
+    }
+    if (actionArgs.regenerateBaselineFile) {
+      args.add("--update-baseline")
+    }
     if (actionArgs.warningsAsErrors) {
       args.add("-Werror")
     } else {

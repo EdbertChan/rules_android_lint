@@ -82,9 +82,10 @@ def _run_android_lint(
     if manifest:
         args.add("--android-manifest", manifest)
         inputs.append(manifest)
-    if not regenerate and baseline:
+    if baseline:
         args.add("--baseline-file", baseline)
-        inputs.append(baseline)
+        if not regenerate:
+            inputs.append(baseline)
     if regenerate:
         args.add("--regenerate-baseline-files")
     if config:
@@ -117,6 +118,9 @@ def _run_android_lint(
 
     args.add("--html-output", html_output)
     outputs.append(html_output)
+
+    if regenerate:
+        outputs.append(baseline)
 
     toolchain = _utils.get_android_lint_toolchain(ctx)
     if toolchain.android_home != None:
@@ -211,6 +215,7 @@ def process_android_lint_issues(ctx, regenerate):
 
     output = ctx.actions.declare_file("{}.xml".format(ctx.label.name))
     html_output = ctx.actions.declare_file("{}.html".format(ctx.label.name))
+    baseline = ctx.actions.declare_file("{}_baseline.xml".format(ctx.label.name)) if regenerate else getattr(ctx.file, "baseline", None)
     _run_android_lint(
         ctx,
         android_lint = _utils.only(_utils.list_or_depset_to_list(_utils.get_android_lint_toolchain(ctx).android_lint.files)),
@@ -224,7 +229,7 @@ def process_android_lint_issues(ctx, regenerate):
         compile_sdk_version = _utils.get_android_lint_toolchain(ctx).compile_sdk_version,
         java_language_level = _utils.get_android_lint_toolchain(ctx).java_language_level,
         kotlin_language_level = _utils.get_android_lint_toolchain(ctx).kotlin_language_level,
-        baseline = getattr(ctx.file, "baseline", None),
+        baseline = baseline,
         config = config,
         warnings_as_errors = ctx.attr.warnings_as_errors,
         custom_rules = ctx.files.custom_rules,

@@ -18,7 +18,7 @@ load(
 )
 
 def _test_impl(ctx):
-    android_lint_results = _process_android_lint_issues(ctx, regenerate = False)
+    android_lint_results = _process_android_lint_issues(ctx, ctx.attr.regenerate)
 
     inputs = []
     inputs.append(android_lint_results.output)
@@ -54,6 +54,11 @@ android_lint_test = rule(
                 mandatory = False,
                 allow_single_file = True,
                 doc = "Lint baseline file.",
+            ),
+            regenerate = attr.bool(
+                mandatory = False,
+                default = False,
+                doc = "Whether to regenerate baseline file or not.",
             ),
             _android_lint_output_validator = attr.label(
                 default = Label("//src:android_lint_output_validator"),

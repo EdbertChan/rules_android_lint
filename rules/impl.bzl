@@ -15,6 +15,9 @@ load(
     _utils = "utils",
 )
 
+def _resource_set_callback(os_name, num_inputs):
+    return {"cpu": 2, "memory": 8000}
+
 def _run_android_lint(
         ctx,
         android_lint,
@@ -152,6 +155,7 @@ def _run_android_lint(
             # If you need to debug what is going on, use -Xlog:gc* -Xlog:class+unload=info -Xlog:class+load=info
             "JVM_FLAGS":"-XX:-UseCompressedClassPointers"
         },
+        resource_set = _resource_set_callback,
     )
 
 def _get_module_name(ctx):
